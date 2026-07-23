@@ -1831,7 +1831,16 @@
       log(`🗑️ ลบ <strong>${name}</strong> ออกจากช่อง ${index + 1}`);
     }
   }
-
+  
+  function moveSlotPosition(index, direction) {
+  const targetIndex = index + direction;
+  if (targetIndex < 0 || targetIndex >= inventorySlotsData.length) return;
+  const temp = inventorySlotsData[index];
+  inventorySlotsData[index] = inventorySlotsData[targetIndex];
+  inventorySlotsData[targetIndex] = temp;
+  renderInventorySlots();
+  }
+  
   function updateInventoryCount() {
     let filledCount = 0;
     inventorySlotsData.forEach(slot => {
