@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plight TTRPG - Character Companion</title>
+  <style>
+    :root {
+      --bg-color: #12131C;
+      --card-bg: #1E202D;
+      --accent-gold: #E5A93C;
+      --accent-red: #E74C3C;
+      --accent-green: #2ECC71;
+      --accent-blue: #3498DB;
+      --accent-purple: #9B59B6;
+      --text-main: #E0E2EC;
+      --text-muted: #8E94A5;
+      --border-color: #2F3346;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 15px 15px 90px 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 680px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    h1, h2, h3 {
+      color: var(--accent-gold);
+      margin: 0 0 10px 0;
+      text-align: center;
+    }
+
+    .app-screen {
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .app-screen.active {
+      display: flex;
+    }
+
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-gold);
+      color: #12131C;
+      border-color: var(--accent-gold);
+    }
+
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-box label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .attr-roll-btn {
+      width: 100%;
+      background: rgba(229, 169, 60, 0.15);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      padding: 4px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: all 0.2s;
+    }
+
+    .attr-roll-btn:hover {
+      background: var(--accent-gold);
+      color: #12131C;
+    }
+
+    .cur-max-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .cur-max-group input {
+      width: 45%;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--accent-gold);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .cur-max-group input:focus {
+      outline: none;
+      border-bottom-color: #fff;
+    }
+
+    .roll-mode-bar {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(0,0,0,0.2);
+      padding: 6px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .roll-mode-bar label {
+      font-size: 0.8rem;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    button {
+      background: var(--accent-gold);
+      color: #12131C;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover { filter: brightness(1.1); }
+    button:active { transform: scale(0.98); }
+
+    .btn-red { background: var(--accent-red); color: #fff; }
+    .btn-green { background: var(--accent-green); color: #fff; }
+    .btn-purple { background: var(--accent-purple); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); }
+    .btn-outline:hover { background: var(--accent-gold); color: #000; }
+
+    select, input[type="number"], input[type="text"], textarea {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 8px;
+      border-radius: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      overflow-y: hidden;
+      min-height: 40px;
+    }
+
+    optgroup {
+      background: var(--card-bg);
+      color: var(--accent-gold);
+      font-weight: bold;
+    }
+
+    option {
+      background: var(--bg-color);
+      color: var(--text-main);
+      white-space: normal;
+      word-wrap: break-word;
+    }
+
+    .char-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .char-card {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-gold);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .char-card-info h4 {
+      margin: 0 0 4px 0;
+      color: var(--accent-gold);
+      font-size: 1.1rem;
+    }
+
+    .char-card-info p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .char-card-actions {
+      display: flex;
+      gap: 8px;
+      width: auto;
+    }
+
+    .char-card-actions button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .dice-dock {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9000;
+      background: rgba(30, 32, 45, 0.92);
+      border: 1px solid var(--accent-gold);
+      border-radius: 30px;
+      padding: 6px 12px;
+      display: flex;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .dice-btn {
+      background: var(--bg-color);
+      color: var(--accent-gold);
+      border: 1px solid var(--border-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .dice-btn:hover {
+      background: var(--accent-gold);
+      color: #12131C;
+    }
+
+    #toastContainer {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+      max-width: 320px;
+      width: calc(100% - 30px);
+    }
+
+    .toast {
+      background: rgba(26, 28, 40, 0.95);
+      border-left: 4px solid var(--accent-gold);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+      font-size: 0.85rem;
+      backdrop-filter: blur(5px);
+      animation: toastIn 0.3s ease-out;
+      pointer-events: auto;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .inv-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .inv-slot-card {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: grab;
+      min-height: 48px;
+    }
+
+    .inv-slot-card.filled {
+      border-color: rgba(229, 169, 60, 0.5);
+      background: rgba(229, 169, 60, 0.05);
+    }
+
+    .drag-handle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      user-select: none;
+    }
+
+    .slot-num {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      width: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .slot-select {
+      flex: 1;
+      font-size: 0.85rem;
+      padding: 5px;
+      min-height: 36px;
+      height: auto;
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      line-height: 1.3;
+    }
+
+    .btn-delete {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      background: rgba(231, 76, 60, 0.2);
+      border: 1px solid var(--accent-red);
+      color: var(--accent-red);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .uses-control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-use {
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 4px;
+    }
+
+    .market-filter {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .filter-btn {
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      background: var(--bg-color);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .filter-btn.active {
+      background: var(--accent-gold);
+      color: #12131C;
+      border-color: var(--accent-gold);
+    }
+
+    .market-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .market-item {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .market-item-info strong {
+      display: block;
+      color: var(--accent-gold);
+      font-size: 0.9rem;
+    }
+
+    .market-item-info div {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .market-buy-btn {
+      width: auto;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .asset-item {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border-color);
+      border-left: 3px solid var(--accent-blue);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .log-area {
+      background: #0B0C12;
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      max-height: 140px;
+      overflow-y: auto;
+      color: var(--text-main);
+    }
+
+    .log-entry {
+      margin-bottom: 4px;
+      border-bottom: 1px dashed #222;
+      padding-bottom: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-right: 4px;
+    }
+    .badge-success { background: var(--accent-green); color: #fff; }
+    .badge-fail { background: var(--accent-red); color: #fff; }
+    .badge-crit { background: var(--accent-gold); color: #000; }
+    
+    .rarity-c { background: #4A5568; color: #fff; }
+    .rarity-u { background: #2B6CB0; color: #fff; }
+    .rarity-r { background: #D69E2E; color: #000; }
+
+    .size-t { border: 1px solid #319795; color: #319795; }
+    .size-s { border: 1px solid #A0AEC0; color: #A0AEC0; }
+    .size-b { border: 1px solid #E53E3E; color: #E53E3E; }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 10000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--accent-gold);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-header {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--accent-gold);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      color: var(--text-main);
+      font-weight: bold;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background: rgba(0,0,0,0.2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    .sub-input-group {
+      margin-top: 4px;
+      padding-left: 10px;
+      border-left: 2px solid var(--accent-gold);
+      display: none;
+    }
+    .sub-input-group.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<div id="toastContainer"></div>
+
+<!-- Floating Dice Bar -->
+<div class="dice-dock">
+  <button class="dice-btn" onclick="rollCustomDice(4)">d4</button>
+  <button class="dice-btn" onclick="rollCustomDice(6)">d6</button>
+  <button class="dice-btn" onclick="rollCustomDice(8)">d8</button>
+  <button class="dice-btn" onclick="rollCustomDice(10)">d10</button>
+  <button class="dice-btn" onclick="rollCustomDice(20)">d20</button>
+  <button class="dice-btn" onclick="rollCustomDice(100)">d100</button>
+</div>
+
+<!-- Custom Item Popup Modal -->
+<div id="customItemModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header">✨ กำหนดรายละเอียด Custom / Magic Item</div>
+    
+    <div class="form-group">
+      <label for="customName">ชื่อไอเทม (Item Name)</label>
+      <input type="text" id="customName" placeholder="เช่น ดาบเวทมนตร์ส่องสว่าง, แหวนคุ้มครอง">
+    </div>
+
+    <div class="form-group">
+      <label>ขนาดไอเทม (Size)</label>
+      <select id="customSize">
+        <option value="S">Standard (S) - 1 ช่อง</option>
+        <option value="T">Tiny (T) - เล็กมาก (3 ชิ้น/ช่อง)</option>
+        <option value="B">Bulky (B) - ใหญ่/กินพื้นที่ (ลด Max Slot ลง 1)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-group">
+        <input type="checkbox" id="customHasUses" onchange="toggleCustomGroup('customHasUses', 'customUsesGroup')">
+        <span>เป็นแบบ Use ไหม (มีจำนวนใช้/พกพาหลายชิ้น)</span>
+      </label>
+      <div id="customUsesGroup" class="sub-input-group">
+        <label style="font-size:0.8rem; color:var(--text-muted);">จำนวนที่มี/ใช้ได้:</label>
+        <input type="number" id="customUses" value="1" min="1">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-group">
+        <input type="checkbox" id="customHasDamage" onchange="toggleCustomGroup('customHasDamage', 'customDamageGroup')">
+        <span>มีดาเมจไหม (Damage Die)</span>
+      </label>
+      <div id="customDamageGroup" class="sub-input-group">
+        <label style="font-size:0.8rem; color:var(--text-muted);">ระบุดาเมจ d อะไร (เช่น d6, d8, d10, 1d6+1):</label>
+        <input type="text" id="customDamage" placeholder="d6">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="checkbox-group">
+        <input type="checkbox" id="customHasAR" onchange="toggleCustomGroup('customHasAR', 'customArGroup')">
+        <span>เป็นเกราะหรือเปล่า (Armor Rating)</span>
+      </label>
+      <div id="customArGroup" class="sub-input-group">
+        <label style="font-size:0.8rem; color:var(--text-muted);">ค่า AR ที่ได้รับ (เช่น 0.25, 0.50, 0.75):</label>
+        <input type="number" id="customAR" value="0.25" step="0.25" min="0" max="3">
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top: 10px;">
+      <button class="btn-purple" onclick="saveCustomItemModal()">💾 บันทึกไอเทม</button>
+      <button class="btn-outline" onclick="closeCustomItemModal()">❌ ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN 1: CHARACTER SELECTION -->
+  <div id="selectScreen" class="app-screen active">
+    <h2>🗡️ Plight RPG Companion</h2>
+    
+    <div class="card">
+      <h3>📜 รายชื่อตัวละคร (Character List)</h3>
+      <p style="font-size:0.85rem; color:var(--text-muted); text-align:center; margin-bottom:15px;">
+        เลือกตัวละครเพื่อเข้าสู่การผจญภัย หรือสร้างตัวละครตัวใหม่
+      </p>
+
+      <button class="btn-green" style="margin-bottom: 15px;" onclick="goToCreateScreen()">➕ สร้างตัวละครใหม่ (Create New)</button>
+
+      <div id="charCardList" class="char-card-list"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: CHARACTER CREATION -->
+  <div id="createScreen" class="app-screen">
+    <h2>✨ สร้างตัวละครใหม่</h2>
+
+    <div class="card">
+      <div style="margin-bottom: 12px;">
+        <button class="btn-green" onclick="generateRandomNewCharForm()">🎲 สุ่มรายละเอียดตัวละครทั้งหมด (Full Random Setup)</button>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 10px;">
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">ชื่อตัวละคร (1)</label>
+          <input type="text" id="newCharName" value="Eldrin">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">เผ่าพันธุ์ (Ancestry)</label>
+          <select id="newCharAncestry">
+            <option value="มนุษย์ (Human)">มนุษย์ (Human)</option>
+            <option value="เอลฟ์ (Elf)">เอลฟ์ (Elf)</option>
+            <option value="คนแคระ (Dwarf)">คนแคระ (Dwarf)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 10px;">
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">ปูมหลัง (2. Background - d20)</label>
+          <input type="text" id="newCharBackground" value="ช่างตีเหล็ก">
+        </div>
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">ของประดับ/ขวัญติดตัว (Trinket)</label>
+          <input type="text" id="newCharTrinket" value="เหรียญนำโชค">
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 10px;">
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">ลักษณะกายภาพ (3. Physical Features)</label>
+          <textarea id="newCharPhysical" rows="1" oninput="autoExpandTextarea(this)">กำยำ, คมสัน, ยาว, ดังกังวาน</textarea>
+        </div>
+        <div>
+          <label style="font-size:0.8rem; color:var(--text-muted);">อุปนิสัยและลักษณะเด่น (4. Traits)</label>
+          <textarea id="newCharTrait" rows="1" oninput="autoExpandTextarea(this)">กล้าหาญ, โลภ, ซื่อสัตย์, ถูกสาป</textarea>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-bottom: 10px;">
+        <div class="stat-box">
+          <label>STR (3d6)</label>
+          <input type="number" id="newStr" value="12" style="text-align:center; font-weight:bold;">
+        </div>
+        <div class="stat-box">
+          <label>DEX (3d6)</label>
+          <input type="number" id="newDex" value="10" style="text-align:center; font-weight:bold;">
+        </div>
+        <div class="stat-box">
+          <label>INT (3d6)</label>
+          <input type="number" id="newInt" value="11" style="text-align:center; font-weight:bold;">
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 15px;">
+        <div class="stat-box">
+          <label>HP Max (สุ่ม d6)</label>
+          <input type="number" id="newHp" value="5" style="text-align:center; font-weight:bold;">
+        </div>
+        <div class="stat-box">
+          <label>เงินเริ่มต้น (5. Coins 3d6)</label>
+          <input type="number" id="newGold" value="12" style="text-align:center; font-weight:bold;">
+        </div>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.8rem; color: var(--text-muted);">
+        🎲 <strong>ระบบสุ่มอุปกรณ์เริ่มต้น (Creation Engine):</strong> เมื่อกดบันทึก ระบบจะสุ่มอุปกรณ์อัตโนมัติตามกฎ ทั้งเสบียง 3 มื้อ, คบเพลิง, อาวุธ (d6), เกราะ (d6), หมวก/โล่ (d6), อุปกรณ์ (d20), เครื่องมือ (d20) และไอเทมโบนัส (d4)
+      </div>
+
+      <div class="grid-2">
+        <button class="btn-purple" onclick="confirmCreateCharacter()">✅ บันทึก & สุ่มอุปกรณ์เริ่มต้น</button>
+        <button class="btn-outline" onclick="goToSelectScreen()">⬅️ ย้อนกลับ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: GAMEPLAY DASHBOARD -->
+  <div id="gameScreen" class="app-screen">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <button class="btn-outline" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="goToSelectScreen()">⬅️ สลับตัวละคร</button>
+      <span style="font-size: 0.9rem; font-weight: bold; color: var(--accent-gold);" id="activeCharHeader">ตัวละคร: Eldrin</span>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('charTab')">👤 ตัวละคร & เป้สะพาย</button>
+      <button class="tab-btn" onclick="switchTab('marketTab')">🛒 ตลาดเมือง (Marketplace)</button>
+    </div>
+
+    <!-- TAB 1: CHARACTER SHEET -->
+    <div id="charTab" class="tab-content active">
+      <div class="card">
+        <h3>📜 ข้อมูลตัวละคร</h3>
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">ชื่อตัวละคร</label>
+            <input type="text" id="charName" onchange="autoSaveCurrentCharacter()">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">เผ่าพันธุ์ (Ancestry)</label>
+            <select id="charAncestry" onchange="autoSaveCurrentCharacter()">
+              <option value="มนุษย์ (Human)">มนุษย์ (Human)</option>
+              <option value="เอลฟ์ (Elf)">เอลฟ์ (Elf)</option>
+              <option value="คนแคระ (Dwarf)">คนแคระ (Dwarf)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">ปูมหลัง (Background)</label>
+            <input type="text" id="charBackground" onchange="autoSaveCurrentCharacter()">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">ของประดับ/ขวัญติดตัว (Trinket)</label>
+            <input type="text" id="charTrinket" onchange="autoSaveCurrentCharacter()">
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 10px;">
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">ลักษณะกายภาพ (Physical Features)</label>
+            <textarea id="charPhysical" rows="1" oninput="autoExpandTextarea(this); autoSaveCurrentCharacter();"></textarea>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:var(--text-muted);">อุปนิสัยและลักษณะเด่น (Traits)</label>
+            <textarea id="charTrait" rows="1" oninput="autoExpandTextarea(this); autoSaveCurrentCharacter();"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <label style="font-size:0.8rem; color:var(--text-muted);">บันทึกเพิ่มเติม / รอยแผลเป็น (Notes & Scars)</label>
+          <textarea id="charNotes" rows="2" placeholder="จดบันทึกเพิ่มเติม เช่น รอยแผลเป็น, คำสาป, ฉายา..." oninput="autoExpandTextarea(this); autoSaveCurrentCharacter();"></textarea>
+        </div>
+      </div>
+
+      <!-- Attributes & Status -->
+      <div class="card">
+        <h3>1. Attributes & Status</h3>
+
+        <div class="roll-mode-bar">
+          <span style="font-size:0.8rem; color:var(--text-muted); font-weight:bold;">โหมดการทอย:</span>
+          <label><input type="radio" name="rollMode" value="normal" checked> ปกติ (1d20)</label>
+          <label><input type="radio" name="rollMode" value="adv"> Adv (ต่ำสุด)</label>
+          <label><input type="radio" name="rollMode" value="disadv"> Disadv (สูงสุด)</label>
+        </div>
+
+        <div class="grid-3">
+          <div class="stat-box">
+            <button class="attr-roll-btn" onclick="performCheck('strCur', 'STR')">🎲 STR</button>
+            <div class="cur-max-group">
+              <input type="number" id="strCur" onchange="updateCalculatedStats(); autoSaveCurrentCharacter();">
+              <span>/</span>
+              <input type="number" id="strMax" onchange="updateCalculatedStats(); autoSaveCurrentCharacter();">
+            </div>
+          </div>
+          <div class="stat-box">
+            <button class="attr-roll-btn" onclick="performCheck('dexCur', 'DEX')">🎲 DEX</button>
+            <div class="cur-max-group">
+              <input type="number" id="dexCur" onchange="autoSaveCurrentCharacter()">
+              <span>/</span>
+              <input type="number" id="dexMax" onchange="autoSaveCurrentCharacter()">
+            </div>
+          </div>
+          <div class="stat-box">
+            <button class="attr-roll-btn" onclick="performCheck('intCur', 'INT')">🎲 INT</button>
+            <div class="cur-max-group">
+              <input type="number" id="intCur" onchange="autoSaveCurrentCharacter()">
+              <span>/</span>
+              <input type="number" id="intMax" onchange="autoSaveCurrentCharacter()">
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 10px;">
+          <div class="stat-box">
+            <label>HP (ปัจจุบัน / Max)</label>
+            <div class="cur-max-group">
+              <input type="number" id="hpCur" onchange="autoSaveCurrentCharacter()">
+              <span>/</span>
+              <input type="number" id="hpMax" onchange="autoSaveCurrentCharacter()">
+            </div>
+          </div>
+          <div class="stat-box" style="border-color: rgba(229, 169, 60, 0.5);">
+            <label>AR (เกราะสุทธิ)</label>
+            <div style="font-size:1.1rem; font-weight:bold; color:var(--accent-gold); margin-top:2px;">
+              <span id="totalARDisplay">0</span> / 3 AR
+            </div>
+          </div>
+          <div class="stat-box">
+            <label>เงินเหรียญ (Gold / c)</label>
+            <input type="number" id="charGold" onchange="autoSaveCurrentCharacter()" style="font-size:1.1rem; text-align:center; border:none; border-bottom:2px solid var(--accent-gold); background:transparent; color:#fff; font-weight:bold;">
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+          <button class="btn-green" style="font-size: 0.8rem; padding: 8px 4px;" onclick="restShort()" title="เพิ่ม HP d4+1">☕ Short Rest<br><small>(+d4+1 HP)</small></button>
+          <button class="btn-purple" style="font-size: 0.8rem; padding: 8px 4px;" onclick="restLong()" title="HP Max & Roll d6 แจ้งเตือนผู้เล่น">🌙 Long Rest<br><small>(HP Max + Roll d6)</small></button>
+          <button class="btn-red" style="font-size: 0.8rem; padding: 8px 4px;" onclick="restFull()" title="Reset ทุกอย่าง Max">✨ Full Rest<br><small>(Reset All Max)</small></button>
+        </div>
+      </div>
+
+      <!-- Inventory System -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h3 style="margin: 0;">2. Inventory Slots Tracker</h3>
+          <button id="swapBtn" class="btn-outline" style="width: auto; padding: 6px 12px; font-size: 0.85rem;" onclick="toggleSwapMode()">🔄 Swap</button>
+        </div>
+        <p style="margin: 0 0 10px 0; font-size: 0.85rem; text-align: center;">
+          ความจุช่องเก็บของสูงสุด: <strong id="maxSlots">16</strong> ช่อง 
+          (<span id="usedSlotsCount">0</span>/<span id="maxSlotsCount">16</span>)<br>
+          <small style="color:var(--text-muted);">(คำนวณจาก [STR Max / 2] + 10 | Bulky ลด Max Slot ลง 1 | 🖐️ ลากหรือใช้ Swap เลื่อนตำแหน่ง)</small>
+        </p>
+        <div id="encumbranceStatus" style="text-align: center; margin-bottom: 8px;">
+          <span class="badge badge-success">รับน้ำหนักได้ปกติ</span>
+        </div>
+
+        <div class="inv-grid" id="inventoryGrid"></div>
+      </div>
+
+      <!-- Assets Tracker -->
+      <div class="card">
+        <h3>3. Assets (ทรัพย์สิน & บริการ)</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 10px 0; text-align:center;">
+          การจ้างวาน, สัตว์พาหนะ, สิ่งปลูกสร้าง และบริการที่ลงทะเบียนไว้
+        </p>
+        <div id="assetsList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+
+        <div style="margin-top: 12px;">
+          <label style="font-size:0.8rem; color:var(--text-muted);">บันทึกทรัพย์สิน / ข้อตกลงเพิ่มเติม (Asset Notes)</label>
+          <textarea id="assetNotes" rows="2" placeholder="จดรายละเอียดเพิ่มเติมเกี่ยวกับทรัพย์สิน สัตว์ หรือการจ้างวาน..." oninput="autoExpandTextarea(this); autoSaveCurrentCharacter();"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: MARKETPLACE -->
+    <div id="marketTab" class="tab-content">
+      <div class="card">
+        <h3>🛒 ตลาดไอเทม & ร้านค้า</h3>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin: 0 0 10px 0; text-align:center;">
+          <span class="badge rarity-c">C</span>Common | <span class="badge rarity-u">U</span>Uncommon | <span class="badge rarity-r">R</span>Rare &nbsp;|&nbsp; 
+          <span class="badge size-t">T</span>Tiny (3/Slot) | <span class="badge size-s">S</span>Standard | <span class="badge size-b">B</span>Bulky (2 Slots)
+        </p>
+
+        <div class="market-filter">
+          <button class="filter-btn active" onclick="filterMarket('all', this)">ทั้งหมด</button>
+          <button class="filter-btn" onclick="filterMarket('melee', this)">⚔️ อาวุธประชิด</button>
+          <button class="filter-btn" onclick="filterMarket('ranged', this)">🏹 อาวุธระยะไกล</button>
+          <button class="filter-btn" onclick="filterMarket('armor', this)">🛡️ เกราะ/โล่</button>
+          <button class="filter-btn" onclick="filterMarket('goods', this)">🎒 สัมภาระ/อุปกรณ์</button>
+          <button class="filter-btn" onclick="filterMarket('hireling', this)">🤝 การจ้างวาน</button>
+          <button class="filter-btn" onclick="filterMarket('service', this)">🍷 บริการ</button>
+          <button class="filter-btn" onclick="filterMarket('mount', this)">🐎 สัตว์/พาหนะ</button>
+          <button class="filter-btn" onclick="filterMarket('structure', this)">🏰 สิ่งปลูกสร้าง</button>
+        </div>
+
+        <div class="market-list" id="marketList"></div>
+      </div>
+    </div>
+
+    <!-- Action Log -->
+    <div class="card">
+      <h3>📜 Log ผลลัพธ์การกระทำ</h3>
+      <div class="log-area" id="logBox">
+        <div class="log-entry">ระบบพร้อมใช้งาน...</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const CHAR_LIST_STORAGE_KEY = 'plight_characters_list_v3';
+
+  // Helper สำหรับขยายความสูง Textarea อัตโนมัติตามเนื้อหา
+  function autoExpandTextarea(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = (el.scrollHeight) + 'px';
+  }
+
+  // =================================================================
+  // 1. CHARACTER CREATION DATABASE (THAI ONLY)
+  // =================================================================
+  const CHAR_CREATION_DB = {
+    backgrounds: [
+      "นักเล่นแร่แปรธาตุ", "ช่างตีเหล็ก", "ย่องเบา / หัวขโมย", "คนขายเนื้อ",
+      "ช่างไม้", "นักบวช", "นักพนัน", "คนขุดหลุมศพ",
+      "หมอสมุนไพร", "นักล่า", "ทหารรับจ้าง", "พ่อค้า",
+      "คนงานเหมือง", "คนนอกกฎหมาย", "นักแสดง", "นักล้วงกระเป๋า",
+      "นักสู้ใต้ดิน", "พรานป่า", "คนรับใช้", "ผู้ลักลอบขนของ"
+    ],
+    physical: {
+      physique: ["นักกีฬา", "กำยำ", "ร่างยักษ์", "ผอมเพรียว", "บึกบึน", "ผอมกะหร่อง", "เตี้ย", "ท้วม/ล่ำ", "กระชับ", "สูงตระหง่าน"],
+      face: ["ตอบ/เห็นกระดูก", "หัก/ผิดรูป", "คมสัน", "ยาว", "ซีดเซียว", "สมบูรณ์แบบ", "มีแผลเป็น", "เหลี่ยม", "ซูบฝ่อ", "กร้านแดดกร้านลม"],
+      hair: ["ล้าน", "ถักเปีย", "หยิก", "สกปรก", "ยาว", "สลวยเงางาม", "พันกันยุ่งเหยิง", "มันเยิ้ม", "หยักศก", "รุงรัง"],
+      speech: ["ขวานผ่าซาก", "ดังกังวาน", "คลุมเครือ/ปริศนา", "ยานคาง", "เป็นทางการ", "แหบพร่า", "ขึ้นจมูก", "ชัดถ้อยชัดคำ", "ติดอ่าง", "กระซิบกระซาบ"]
+    },
+    traits: {
+      virtue: ["ทะเยอทะยาน", "รอบคอบ", "กล้าหาญ", "มีระเบียบวินัย", "ชอบเข้าสังคม", "มีเกียรติ", "ถ่อมตัว", "มีเมตตา", "เยือกเย็น", "อดทนอดกลั้น"],
+      iniquity: ["ก้าวร้าว", "ขมขื่น/เคียดแค้น", "ขี้ขลาด", "หลอกลวง", "โลภ", "ขี้เกียจ", "ขี้กังวล", "หยาบคาย", "หลงตัวเอง", "เจ้าคิดเจ้าแค้น"],
+      reputation: ["ใจบุญ", "ไร้มารยาท", "โหดร้าย", "อันตราย", "มีวาทศิลป์", "ซื่อสัตย์", "น่ารังเกียจ", "เป็นที่เคารพ", "ประหลาด", "ชาญฉลาด"],
+      misfortune: ["ถูกทอดทิ้ง", "เสพติด", "ถูกแบล็คเมล์", "ถูกตัดสินลงโทษ", "ถูกสาป", "ถูกโกง", "ถูกลดขั้น", "ถูกตัดขาดจากครอบครัว", "ถูกเนรเทศ", "มีหนี้สิน"]
+    },
+    trinkets: [
+      "ถุงใส่ลูกแก้ว", "ด้ามดาบหัก", "ผ้าเช็ดหน้าปักลาย", "อัญมณีปลอม", "ทองคนโง่ / แร่ไพไรต์",
+      "เหรียญนำโชค", "เข็มกลัดศักดิ์สิทธิ์", "โฉนดที่ดิน", "กล่องดนตรี", "ตราประจำตระกูลเก่าแก่",
+      "เขี้ยวออร์ค", "กุญแจสลักลายวิจิตร", "น้ำหอม", "ไข่มังกรกลายเป็นหิน", "แหวนตราประทับ",
+      "ภาพวาดของคนรัก", "เทวรูปขนาดเล็ก", "กล้องยาสูบ", "ลูกเต๋าโกง / ถ่วงน้ำหนัก", "โกศบรรจุเถ้ากระดูก"
+    ],
+    gearList: ['gd_air_bladder', 'gd_ball_bearings', 'gd_bedroll', 'gd_cart', 'gd_chain', 'gd_fire_oil', 'gd_grappling_hook', 'gd_ladder', 'gd_large_trap', 'gd_lockpicks', 'gd_manacles', 'gd_mirror', 'gd_pick', 'gd_pole', 'gd_pulley', 'gd_rope', 'gd_sack', 'gd_spyglass', 'gd_tinderbox', 'gd_tent'],
+    toolsList: ['gd_bellows', 'gd_bucket', 'gd_caltrops', 'gd_chalk', 'gd_chisel', 'gd_cooking_pots', 'gd_crowbar', 'gd_drill', 'gd_fishing_rod', 'gd_glue', 'gd_grease', 'gd_hammer', 'gd_hourglass', 'gd_lock_key', 'gd_metal_file', 'gd_nails', 'gd_net', 'gd_saw', 'gd_shovel', 'gd_spike']
+  };
+
+  // MARKET DATABASE (SORTED BY RARITY C -> U -> R, THEN BY COST ASCENDING)
+  const MARKET_DATABASE = [
+    // === RARITY: C (Common) ===
+    { id: 'gd_tinderbox', name: 'ชุดจุดไฟ', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'ชุดจุดไฟ' },
+    { id: 'gd_chalk', name: 'ชอล์ก', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'ชอล์ก' },
+    { id: 'gd_nails', name: 'ตะปู (25 ตัว)', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'ตะปู 25 ตัว' },
+    { id: 'gd_spike', name: 'ตะปูตอกหมุดใหญ่', category: 'goods', rarity: 'C', size: 'S', cost: 1, ar: 0, desc: 'ตะปูตอกหมุดใหญ่' },
+    { id: 'gd_glass_bottle', name: 'ขวดแก้ว', category: 'goods', rarity: 'C', size: 'S', cost: 1, ar: 0, desc: 'ขวดแก้ว' },
+    { id: 'gd_lantern_oil', name: 'น้ำมันตะเกียง', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'น้ำมันตะเกียง' },
+    { id: 'gd_soap', name: 'สบู่', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'สบู่' },
+    { id: 'gd_twine', name: 'เชือกด้าย', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'เชือกด้าย' },
+    { id: 'gd_whetstone', name: 'หินลับมีด', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'หินลับมีด' },
+    { id: 'gd_whistle', name: 'นกหวีด', category: 'goods', rarity: 'C', size: 'T', cost: 1, ar: 0, desc: 'นกหวีด' },
+    { id: 'sv_bath_inn', name: 'อาบน้ำที่โรงแรม', category: 'service', rarity: 'C', size: 'S', cost: 1, ar: 0, desc: 'บริการอาบน้ำที่โรงแรมน้อย/ร้านค้า' },
+    { id: 'sv_wash_clothes', name: 'ซักเสื้อผ้า', category: 'service', rarity: 'C', size: 'S', cost: 1, ar: 0, desc: 'บริการซักเสื้อผ้า' },
+
+    { id: 'mw_cudgel', name: 'กระบองไม้ d6', category: 'melee', damage: 'd6', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d6' },
+    { id: 'mw_dagger', name: 'มีดพก d6', category: 'melee', damage: 'd6', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d6' },
+    { id: 'mw_hatchet', name: 'ขวานเล็ก d6', category: 'melee', damage: 'd6', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d6' },
+    { id: 'mw_quarterstaff', name: 'พลองยาว d6', category: 'melee', damage: 'd6', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d6' },
+    { id: 'mw_sickle', name: 'เคียว d6', category: 'melee', damage: 'd6', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d6' },
+    { id: 'mw_spear', name: 'หอก d8', category: 'melee', damage: 'd8', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'rw_sling', name: 'สายเหวี่ยงหิน d4', category: 'ranged', damage: 'd4', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'ความเสียหาย d4' },
+    { id: 'ar_leather_cap', name: 'หมวกหนัง', category: 'armor', rarity: 'C', size: 'S', cost: 5, ar: 0.25, desc: 'เกราะ +0.25 AR (สวมศีรษะ)' },
+    { id: 'ar_leather_tasset', name: 'เกราะต้นขาหนัง', category: 'armor', rarity: 'C', size: 'S', cost: 5, ar: 0.25, desc: 'เกราะ +0.25 AR (สวมขา)' },
+    { id: 'ar_studded_gloves', name: 'ถุงมือหนังตอกหมุด', category: 'armor', rarity: 'C', size: 'S', cost: 5, ar: 0.25, desc: 'เกราะ +0.25 AR (สวมมือ)' },
+    { id: 'gd_air_bladder', name: 'ถุงลม', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ถุงลม' },
+    { id: 'gd_ball_bearings', name: 'ลูกเหล็กทรงกลม', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'ลูกเหล็กทรงกลม' },
+    { id: 'gd_bandage', name: 'ผ้าพันแผล', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'ผ้าพันแผล' },
+    { id: 'gd_bedroll', name: 'ถุงนอน', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ถุงนอน' },
+    { id: 'gd_bucket', name: 'ถังน้ำ', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ถังน้ำ' },
+    { id: 'gd_chisel', name: 'สิ่ว', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'สิ่ว' },
+    { id: 'gd_glue', name: 'กาว', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'กาว' },
+    { id: 'gd_hammer', name: 'ค้อน', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ค้อน' },
+    { id: 'gd_large_sponge', name: 'ฟองน้ำขนาดใหญ่', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ฟองน้ำขนาดใหญ่' },
+    { id: 'gd_metal_file', name: 'ตะไบเหล็ก', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'ตะไบเหล็ก' },
+    { id: 'gd_mirror', name: 'กระจกเงา', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'กระจกเงา' },
+    { id: 'gd_pole', name: 'ไม้ยาว (10 ฟุต)', category: 'goods', rarity: 'C', size: 'B', cost: 5, ar: 0, desc: 'ไม้ยาว 10 ฟุต' },
+    { id: 'gd_quill_ink', name: 'ปากกาขนนกและหมึก', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'ปากกาขนนกและหมึก' },
+    { id: 'gd_rope', name: 'เชือก (25 ฟุต)', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'เชือก 25 ฟุต' },
+    { id: 'gd_sack', name: 'กระสอบ', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'กระสอบ' },
+    { id: 'gd_saw', name: 'เลื่อย', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'เลื่อย' },
+    { id: 'gd_shovel', name: 'พลั่ว', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'พลั่ว' },
+    { id: 'gd_small_bell', name: 'กระดิ่งเล็ก', category: 'goods', rarity: 'C', size: 'T', cost: 5, ar: 0, desc: 'กระดิ่งเล็ก' },
+    { id: 'gd_torch', name: 'คบเพลิง', category: 'goods', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'คบเพลิง' },
+    { id: 'hl_local_guide', name: 'คนนำทางท้องถิ่น', category: 'hireling', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ผู้ว่าจ้างคนนำทางท้องถิ่น (5c ต่อวัน)' },
+    { id: 'hl_sailor', name: 'กะลาสี', category: 'hireling', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ผู้ว่าจ้างกะลาสีเรือ (5c ต่อวัน)' },
+    { id: 'hl_tracker', name: 'พรานสะกดรอย', category: 'hireling', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ผู้ว่าจ้างพรานสะกดรอย (5c ต่อวัน)' },
+    { id: 'an_guard_dog', name: 'สุนัขเฝ้าบ้าน', category: 'mount', damage: 'd4', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'สุนัขเฝ้าบ้าน (โจมตี d4)' },
+    { id: 'sv_feast', name: 'งานเลี้ยงอาหาร', category: 'service', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'มื้ออาหารใหญ่' },
+    { id: 'sv_haircut', name: 'ตัดผม', category: 'service', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'บริการตัดผม' },
+    { id: 'sv_lodging', name: 'ที่พักแรมที่โรงแรม', category: 'service', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'ที่พักแรมที่โรงแรม' },
+    { id: 'sv_stable_service', name: 'ฝากสัตว์เลี้ยงที่คอก', category: 'service', rarity: 'C', size: 'S', cost: 5, ar: 0, desc: 'บริการคอกสัตว์' },
+
+    { id: 'mw_club', name: 'กระบองหนัก d8', category: 'melee', damage: 'd8', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'mw_short_sword', name: 'ดาบสั้น d8', category: 'melee', damage: 'd8', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'rw_short_bow', name: 'ธนูกระทัดรัด d4', category: 'ranged', damage: 'd4', rarity: 'C', size: 'B', cost: 10, ar: 0, desc: 'ความเสียหาย d4 (พกพายาก)' },
+    { id: 'gd_bellows', name: 'ท่อสูบลม', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ท่อสูบลม' },
+    { id: 'gd_caltrops', name: 'เหล็กแหลมดักทาง', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'เหล็กแหลมดักทาง' },
+    { id: 'gd_chain', name: 'โซ่ (10 ฟุต)', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'โซ่ 10 ฟุต' },
+    { id: 'gd_cooking_pots', name: 'หม้อต้มอาหาร', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'หม้อต้มอาหาร' },
+    { id: 'gd_drill', name: 'สว่านมือ', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'สว่านมือ' },
+    { id: 'gd_face_paint', name: 'สีทาหน้า', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'สีทาหน้า' },
+    { id: 'gd_fire_oil', name: 'น้ำมันจุดไฟ', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'น้ำมันจุดไฟ' },
+    { id: 'gd_fishing_rod', name: 'คันเบ็ดตกปลา', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'คันเบ็ดตกปลา' },
+    { id: 'gd_food_ration', name: 'เสบียงอาหาร', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'เสบียงอาหาร' },
+    { id: 'gd_grease', name: 'จาระบี', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'จาระบี' },
+    { id: 'gd_horn', name: 'แตรสัตว์', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'แตรสัตว์' },
+    { id: 'gd_incense', name: 'กำยาน', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'กำยาน' },
+    { id: 'gd_ladder', name: 'บันได (10 ฟุต)', category: 'goods', rarity: 'C', size: 'B', cost: 10, ar: 0, desc: 'บันได 10 ฟุต' },
+    { id: 'gd_lantern', name: 'ตะเกียง', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ตะเกียง' },
+    { id: 'gd_large_trap', name: 'กับดักขนาดใหญ่', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'กับดักขนาดใหญ่' },
+    { id: 'gd_lens', name: 'เลนส์ขยาย', category: 'goods', rarity: 'C', size: 'T', cost: 10, ar: 0, desc: 'เลนส์ขยาย' },
+    { id: 'gd_lock_and_key', name: 'กุญแจและแม่กุญแจ', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'กุญแจและแม่กุญแจ' },
+    { id: 'gd_manacles', name: 'กุญแจมือ', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'กุญแจมือ' },
+    { id: 'gd_net', name: 'ตาข่าย', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ตาข่าย' },
+    { id: 'gd_pick', name: 'อีโน้งเจาะหิน', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'อีโน้งเจาะหิน' },
+    { id: 'gd_pulley', name: 'รอก', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'รอก' },
+    { id: 'gd_tar', name: 'ยางตระกูลน้ำมันดิบ', category: 'goods', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ยางตระกูลน้ำมันดิบ' },
+    { id: 'hl_locksmith', name: 'ช่างสะเดาะกุญแจ', category: 'hireling', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ผู้ว่าจ้างช่างสะเดาะกุญแจ (10c ต่อวัน)' },
+    { id: 'hl_navigator', name: 'ต้นเรือ/คนนำทาง', category: 'hireling', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ผู้ว่าจ้างคนนำทางเรือ (10c ต่อวัน)' },
+    { id: 'hl_trapper', name: 'นายพรานดักสัตว์', category: 'hireling', rarity: 'C', size: 'S', cost: 10, ar: 0, desc: 'ผู้ว่าจ้างนายพรานดักสัตว์ (10c ต่อวัน)' },
+
+    { id: 'mw_rapier', name: 'ดาบเรเปียร์ d8', category: 'melee', damage: 'd8', rarity: 'C', size: 'S', cost: 15, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'ar_buckler', name: 'โล่เล็ก', category: 'armor', rarity: 'C', size: 'S', cost: 15, ar: 0.25, desc: 'เกราะ +0.25 AR (มือรอง)' },
+    { id: 'hl_blacksmith', name: 'ช่างเหล็ก', category: 'hireling', rarity: 'C', size: 'S', cost: 15, ar: 0, desc: 'ผู้ว่าจ้างช่างเหล็ก (15c ต่อวัน)' },
+
+    { id: 'mw_mace', name: 'กระบองหัวตุ้ม d8', category: 'melee', damage: 'd8', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'mw_pike', name: 'หอกยาว d10', category: 'melee', damage: 'd10', rarity: 'C', size: 'B', cost: 20, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'rw_bow', name: 'ธนู d6', category: 'ranged', damage: 'd6', rarity: 'C', size: 'B', cost: 20, ar: 0, desc: 'ความเสียหาย d6 (พกพายาก)' },
+    { id: 'ar_brigandine', name: 'เกราะหมุดบริแกนดีน', category: 'armor', rarity: 'C', size: 'B', cost: 20, ar: 0.25, desc: 'เกราะ +0.25 AR (ส่วนลำตัว)' },
+    { id: 'gd_blank_book', name: 'สมุดเปล่า', category: 'goods', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'สมุดเปล่า' },
+    { id: 'gd_crowbar', name: 'ชะแลง', category: 'goods', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'ชะแลง' },
+    { id: 'hl_animal_handler', name: 'ผู้ดูแลสัตว์', category: 'hireling', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'ผู้ว่าจ้างผู้ดูแลสัตว์ (20c ต่อวัน)' },
+    { id: 'hl_scholar', name: 'นักปราชญ์', category: 'hireling', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'ผู้ว่าจ้างนักปราชญ์ (20c ต่อวัน)' },
+    { id: 'sv_courier', name: 'คนส่งสาร', category: 'service', rarity: 'C', size: 'S', cost: 20, ar: 0, desc: 'บริการคนส่งสาร' },
+    { id: 'an_mule', name: 'ลา', category: 'mount', rarity: 'C', size: 'B', cost: 20, ar: 0, desc: 'ลา (+4 ช่องเก็บของ, ไม่เพิ่มความเร็วเดินทาง)' },
+
+    { id: 'mw_heavy_club', name: 'กระบองยักษ์ d10', category: 'melee', damage: 'd10', rarity: 'C', size: 'B', cost: 25, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'gd_drum', name: 'กลอง', category: 'goods', rarity: 'C', size: 'S', cost: 25, ar: 0, desc: 'กลอง' },
+    { id: 'gd_flute', name: 'ขลุ่ย', category: 'goods', rarity: 'C', size: 'S', cost: 25, ar: 0, desc: 'ขลุ่ย' },
+    { id: 'gd_grappling_hook', name: 'ตะขอเกี่ยว', category: 'goods', rarity: 'C', size: 'S', cost: 25, ar: 0, desc: 'ตะขอเกี่ยว' },
+    { id: 'gd_holy_water', name: 'น้ำมนต์', category: 'goods', rarity: 'C', size: 'T', cost: 25, ar: 0, desc: 'น้ำมนต์' },
+    { id: 'gd_lockpicks', name: 'ชุดอุปกรณ์สะเดาะกุญแจ', category: 'goods', rarity: 'C', size: 'T', cost: 25, ar: 0, desc: 'ชุดอุปกรณ์สะเดาะกุญแจ' },
+    { id: 'gd_tent', name: 'เต็นท์ (2 คน)', category: 'goods', rarity: 'C', size: 'B', cost: 25, ar: 0, desc: 'เต็นท์พักแรมสำหรับ 2 คน' },
+
+    { id: 'gd_hourglass', name: 'นาฬิกาทราย', category: 'goods', rarity: 'C', size: 'S', cost: 35, ar: 0, desc: 'นาฬิกาทราย' },
+    { id: 'gd_harp', name: 'พิณ', category: 'goods', rarity: 'C', size: 'S', cost: 40, ar: 0, desc: 'พิณ' },
+    { id: 'gd_spyglass', name: 'กล้องส่องทางไกล', category: 'goods', rarity: 'C', size: 'T', cost: 40, ar: 0, desc: 'กล้องส่องทางไกล' },
+    { id: 'gd_lute', name: 'พิณลูต', category: 'goods', rarity: 'C', size: 'S', cost: 50, ar: 0, desc: 'พิณลูต' },
+    { id: 'st_cottage', name: 'กระท่อม', category: 'structure', rarity: 'C', size: 'B', cost: 50, ar: 0, desc: 'สิ่งก่อสร้างกระท่อม' },
+    { id: 'gd_cart', name: 'รถเข็น', category: 'goods', rarity: 'C', size: 'B', cost: 75, ar: 0, desc: 'รถเข็น (+4 ช่องเก็บของ)' },
+    { id: 'st_stone_house', name: 'บ้านหิน', category: 'structure', rarity: 'C', size: 'B', cost: 100, ar: 0, desc: 'สิ่งก่อสร้างบ้านหิน' },
+    { id: 'gd_wagon', name: 'เกวียนใหญ่', category: 'goods', rarity: 'C', size: 'B', cost: 200, ar: 0, desc: 'เกวียนใหญ่ (+8 ช่อง, ใช้ม้า 2 ตัวลาก)' },
+    { id: 'st_fort', name: 'ป้อมปราการ', category: 'structure', rarity: 'C', size: 'B', cost: 500, ar: 0, desc: 'สิ่งก่อสร้างป้อมปราการ' },
+    { id: 'st_stronghold', name: 'ป้อมปราการหลัก', category: 'structure', rarity: 'C', size: 'B', cost: 1000, ar: 0, desc: 'สิ่งก่อสร้างฐานมั่นคง' },
+    { id: 'st_castle', name: 'ปราสาท', category: 'structure', rarity: 'C', size: 'B', cost: 5000, ar: 0, desc: 'สิ่งก่อสร้างปราสาท' },
+
+    // === RARITY: U (Uncommon) ===
+    { id: 'mw_whip', name: 'แส้ d4', category: 'melee', damage: 'd4', rarity: 'U', size: 'S', cost: 5, ar: 0, desc: 'ความเสียหาย d4' },
+    { id: 'ar_mail_handwraps', name: 'ถุงมือโซ่ถัก', category: 'armor', rarity: 'U', size: 'S', cost: 5, ar: 0.5, desc: 'เกราะ +0.5 AR (สวมมือ)' },
+    { id: 'mw_broadsword', name: 'ดาบใบกว้าง d8', category: 'melee', damage: 'd8', rarity: 'U', size: 'S', cost: 10, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'ar_mail_coif', name: 'หมวกฮู้ดโซ่ถัก', category: 'armor', rarity: 'U', size: 'S', cost: 10, ar: 0.5, desc: 'เกราะ +0.5 AR (สวมศีรษะ)' },
+    { id: 'gd_poison_sleeping', name: 'ยาสลบ', category: 'goods', rarity: 'U', size: 'T', cost: 10, ar: 0, desc: 'ยาสลบ' },
+    { id: 'hl_bodyguard', name: 'องครักษ์', category: 'hireling', rarity: 'U', size: 'S', cost: 10, ar: 0, desc: 'ผู้ว่าจ้างองครักษ์ (10c ต่อวัน)' },
+
+    { id: 'mw_battle_axe', name: 'ขวานศึก d8', category: 'melee', damage: 'd8', rarity: 'U', size: 'S', cost: 15, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'mw_scimitar', name: 'ดาบโค้งสคิมิทาร์ d8', category: 'melee', damage: 'd8', rarity: 'U', size: 'S', cost: 15, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'ar_gambeson', name: 'เสื้อนวมกันกระแทก', category: 'armor', rarity: 'U', size: 'S', cost: 15, ar: 0.25, desc: 'เกราะ +0.25 AR (สวมทับใต้เกราะโซ่)' },
+    { id: 'ar_scale_poleyn', name: 'เกราะสนับเข่าเกล็ด', category: 'armor', rarity: 'U', size: 'S', cost: 15, ar: 0.5, desc: 'เกราะ +0.5 AR (สวมขา)' },
+    { id: 'mw_flail', name: 'กระบองโซ่ d8', category: 'melee', damage: 'd8', rarity: 'U', size: 'S', cost: 20, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'mw_morningstar', name: 'กระบองดาวหนาม d8', category: 'melee', damage: 'd8', rarity: 'U', size: 'S', cost: 20, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'ar_helmet', name: 'หมวกเหล็ก', category: 'armor', rarity: 'U', size: 'S', cost: 20, ar: 0.75, desc: 'เกราะ +0.75 AR (สวมศีรษะ)' },
+    { id: 'ar_heater_shield', name: 'โล่ฮีตเตอร์', category: 'armor', rarity: 'U', size: 'S', cost: 25, ar: 0.5, desc: 'เกราะ +0.5 AR (มือรอง)' },
+    { id: 'sv_healing', name: 'การรักษาค่าพลัง', category: 'service', rarity: 'U', size: 'S', cost: 25, ar: 0, desc: 'บริการรักษาค่าพลัง' },
+
+    { id: 'mw_glaive', name: 'ง้าว d10', category: 'melee', damage: 'd10', rarity: 'U', size: 'B', cost: 30, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'mw_halberd', name: 'ทวนขวาน d10', category: 'melee', damage: 'd10', rarity: 'U', size: 'B', cost: 30, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'rw_longbow', name: 'ธนูยาว d8', category: 'ranged', damage: 'd8', rarity: 'U', size: 'B', cost: 30, ar: 0, desc: 'ความเสียหาย d8 (พกพายาก)' },
+    { id: 'hl_alchemist', name: 'นักแปรธาตุ', category: 'hireling', rarity: 'U', size: 'S', cost: 30, ar: 0, desc: 'ผู้ว่าจ้างนักแปรธาตุ (30c ต่อวัน)' },
+    { id: 'mw_long_sword', name: 'ดาบยาว d10', category: 'melee', damage: 'd10', rarity: 'U', size: 'B', cost: 35, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'ar_chainmail', name: 'เกราะถักลูกโซ่', category: 'armor', rarity: 'U', size: 'B', cost: 40, ar: 0.5, desc: 'เกราะ +0.5 AR (ส่วนลำตัว)' },
+    { id: 'an_riding_horse', name: 'ม้าขี่', category: 'mount', rarity: 'U', size: 'B', cost: 40, ar: 0, desc: 'ม้าขี่ (+2 ช่องเก็บของ)' },
+    { id: 'hl_smuggler', name: 'คนลักลอบสินค้า', category: 'hireling', rarity: 'U', size: 'S', cost: 50, ar: 0, desc: 'ผู้ว่าจ้างคนลักลอบสินค้า (50c หรือ 15%)' },
+    { id: 'sv_teacher', name: 'ครูผู้สอนทักษะ', category: 'service', rarity: 'U', size: 'S', cost: 75, ar: 0, desc: 'อาจารย์ผู้สอนทักษะ' },
+
+    // === RARITY: R (Rare) ===
+    { id: 'mw_falchion', name: 'ดาบโค้งฟาลเชียน d8', category: 'melee', damage: 'd8', rarity: 'R', size: 'S', cost: 15, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'gd_poison_hallucinogen', name: 'ยาพิษประสาทหลอน', category: 'goods', rarity: 'R', size: 'T', cost: 15, ar: 0, desc: 'ยาพิษประสาทหลอน' },
+    { id: 'gd_poison_paralyzing', name: 'ยาพิษอัมพาต', category: 'goods', rarity: 'R', size: 'T', cost: 15, ar: 0, desc: 'ยาพิษอัมพาต' },
+    { id: 'gd_poison_lethal', name: 'ยาพิษร้ายแรง', category: 'goods', rarity: 'R', size: 'T', cost: 20, ar: 0, desc: 'ยาพิษร้ายแรง' },
+    { id: 'mw_bastard_sword', name: 'ดาบบาสตาร์ด d10', category: 'melee', damage: 'd10', rarity: 'R', size: 'B', cost: 25, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'mw_flanged_mace', name: 'กระบองเหล็กมีสัน d8', category: 'melee', damage: 'd8', rarity: 'R', size: 'S', cost: 25, ar: 0, desc: 'ความเสียหาย d8' },
+    { id: 'mw_maul', name: 'ค้อนยักษ์ d10', category: 'melee', damage: 'd10', rarity: 'R', size: 'B', cost: 25, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+
+    { id: 'mw_war_hammer', name: 'ค้อนศึก d10', category: 'melee', damage: 'd10', rarity: 'R', size: 'B', cost: 30, ar: 0, desc: 'ความเสียหาย d10 (พกพายาก)' },
+    { id: 'rw_crossbow', name: 'หน้าไม้ d8', category: 'ranged', damage: 'd8', rarity: 'R', size: 'B', cost: 35, ar: 0, desc: 'ความเสียหาย d8 (พกพายาก)' },
+    { id: 'ar_plate_gauntlets', name: 'ถุงมือเหล็กแผ่น', category: 'armor', rarity: 'R', size: 'B', cost: 40, ar: 0.75, desc: 'เกราะ +0.75 AR (สวมมือ)' },
+    { id: 'ar_kite_shield', name: 'โล่ทรงว่าว', category: 'armor', rarity: 'R', size: 'S', cost: 45, ar: 0.75, desc: 'เกราะ +0.75 AR (มือรอง)' },
+    { id: 'ar_plate_greaves', name: 'เกราะหน้าแข้งเหล็ก', category: 'armor', rarity: 'R', size: 'B', cost: 45, ar: 0.75, desc: 'เกราะ +0.75 AR (สวมขา)' },
+    { id: 'ar_plate_mail', name: 'เกราะอกแผ่นเหล็ก', category: 'armor', rarity: 'R', size: 'B', cost: 60, ar: 0.75, desc: 'เกราะ +0.75 AR (ส่วนลำตัว)' },
+    { id: 'an_war_horse', name: 'ม้าศึก', category: 'mount', rarity: 'R', size: 'B', cost: 60, ar: 0, desc: 'ม้าศึก (+3 ช่องเก็บของ)' }
+  ];
+
+  const rarityRank = { 'C': 1, 'U': 2, 'R': 3 };
+  MARKET_DATABASE.sort((a, b) => {
+    if (rarityRank[a.rarity] !== rarityRank[b.rarity]) {
+      return rarityRank[a.rarity] - rarityRank[b.rarity];
+    }
+    return a.cost - b.cost;
+  });
+
+  const names = ["Aethel", "Brim", "Caelen", "Doran", "Elysia", "Fenrik", "Gareth", "Halia", "Ivor", "Kaelen", "Lysandra", "Marek"];
+  const ancestries = ["มนุษย์ (Human)", "เอลฟ์ (Elf)", "คนแคระ (Dwarf)"];
+
+  let characterList = [];
+  let currentActiveCharId = null;
+  let inventorySlotsData = [];
+  let assetsData = [];
+  let draggedSlotIndex = null;
+  let editingCustomSlotIndex = null;
+  let isSwapMode = false; // โหมดสลับลำดับด้วยลูกศรสำหรับ Safari/Mobile
+
+  // SYSTEM HELPERS
+  function roll3d6() {
+    return (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1) + (Math.floor(Math.random() * 6) + 1);
+  }
+  function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  // SCREEN NAVIGATION
+  function goToSelectScreen() {
+    autoSaveCurrentCharacter();
+    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('selectScreen').classList.add('active');
+    renderCharacterListCard();
+  }
+
+  function goToCreateScreen() {
+    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('createScreen').classList.add('active');
+    generateRandomNewCharForm();
+  }
+
+  function goToGameScreen(charId) {
+    currentActiveCharId = charId;
+    const char = characterList.find(c => c.id === charId);
+    if (!char) return;
+
+    document.getElementById('charName').value = char.name;
+    document.getElementById('charAncestry').value = char.ancestry;
+    document.getElementById('charBackground').value = char.background;
+    document.getElementById('charTrinket').value = char.trinket || '';
+
+    const physEl = document.getElementById('charPhysical');
+    physEl.value = char.physical || 'ปกติ';
+    autoExpandTextarea(physEl);
+
+    const traitEl = document.getElementById('charTrait');
+    traitEl.value = char.trait || '';
+    autoExpandTextarea(traitEl);
+
+    const notesEl = document.getElementById('charNotes');
+    notesEl.value = char.notes || '';
+    autoExpandTextarea(notesEl);
+
+    document.getElementById('strCur').value = char.strCur;
+    document.getElementById('strMax').value = char.strMax;
+    document.getElementById('dexCur').value = char.dexCur;
+    document.getElementById('dexMax').value = char.dexMax;
+    document.getElementById('intCur').value = char.intCur;
+    document.getElementById('intMax').value = char.intMax;
+
+    document.getElementById('hpCur').value = char.hpCur;
+    document.getElementById('hpMax').value = char.hpMax;
+    document.getElementById('charGold').value = char.gold;
+
+    inventorySlotsData = char.inventorySlots || [];
+    assetsData = char.assets || [];
+
+    const assetNotesEl = document.getElementById('assetNotes');
+    assetNotesEl.value = char.assetNotes || '';
+    autoExpandTextarea(assetNotesEl);
+
+    document.getElementById('activeCharHeader').innerText = `ตัวละคร: ${char.name}`;
+
+    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('gameScreen').classList.add('active');
+
+    renderInventorySlots();
+    renderAssets();
+    log(`⚔️ เข้าสู่เกมในฐานะ: <strong>${char.name}</strong>`);
+  }
+
+  // STORAGE
+  function loadAllCharactersFromStorage() {
+    const saved = localStorage.getItem(CHAR_LIST_STORAGE_KEY);
+    characterList = saved ? JSON.parse(saved) : [];
+  }
+
+  function saveAllCharactersToStorage() {
+    localStorage.setItem(CHAR_LIST_STORAGE_KEY, JSON.stringify(characterList));
+  }
+
+  function autoSaveCurrentCharacter() {
+    if (!currentActiveCharId) return;
+
+    const charIndex = characterList.findIndex(c => c.id === currentActiveCharId);
+    if (charIndex !== -1) {
+      characterList[charIndex] = {
+        id: currentActiveCharId,
+        name: document.getElementById('charName').value || 'ไม่มีชื่อ',
+        ancestry: document.getElementById('charAncestry').value,
+        background: document.getElementById('charBackground').value,
+        trinket: document.getElementById('charTrinket').value,
+        physical: document.getElementById('charPhysical').value,
+        trait: document.getElementById('charTrait').value,
+        notes: document.getElementById('charNotes').value,
+        strCur: parseInt(document.getElementById('strCur').value) || 10,
+        strMax: parseInt(document.getElementById('strMax').value) || 10,
+        dexCur: parseInt(document.getElementById('dexCur').value) || 10,
+        dexMax: parseInt(document.getElementById('dexMax').value) || 10,
+        intCur: parseInt(document.getElementById('intCur').value) || 10,
+        intMax: parseInt(document.getElementById('intMax').value) || 10,
+        hpCur: parseInt(document.getElementById('hpCur').value) || 5,
+        hpMax: parseInt(document.getElementById('hpMax').value) || 5,
+        gold: parseInt(document.getElementById('charGold').value) || 0,
+        inventorySlots: inventorySlotsData,
+        assets: assetsData,
+        assetNotes: document.getElementById('assetNotes').value
+      };
+      saveAllCharactersToStorage();
+    }
+  }
+
+  function renderCharacterListCard() {
+    loadAllCharactersFromStorage();
+    const container = document.getElementById('charCardList');
+    container.innerHTML = '';
+
+    if (characterList.length === 0) {
+      container.innerHTML = `<div style="text-align:center; padding: 20px; color:var(--text-muted);">ยังไม่มีตัวละคร กดปุ่มด้านบนเพื่อสร้างตัวละครใหม่!</div>`;
+      return;
+    }
+
+    characterList.forEach(char => {
+      const card = document.createElement('div');
+      card.className = 'char-card';
+      card.innerHTML = `
+        <div class="char-card-info">
+          <h4>${char.name}</h4>
+          <p>${char.ancestry} | ${char.background} ${char.trinket ? '(' + char.trinket + ')' : ''}</p>
+          <p style="margin-top:4px; color:var(--accent-gold);">
+            STR: ${char.strCur}/${char.strMax} | DEX: ${char.dexCur}/${char.dexMax} | INT: ${char.intCur}/${char.intMax} | HP: ${char.hpCur}/${char.hpMax}
+          </p>
+        </div>
+        <div class="char-card-actions">
+          <button class="btn-green" onclick="goToGameScreen('${char.id}')">⚔️ เล่น</button>
+          <button class="btn-red" onclick="deleteCharacter('${char.id}')">🗑️</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function deleteCharacter(charId) {
+    if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบตัวละครนี้?')) {
+      characterList = characterList.filter(c => c.id !== charId);
+      saveAllCharactersToStorage();
+      renderCharacterListCard();
+      showToast('🗑️ ลบตัวละครเรียบร้อยแล้ว');
+    }
+  }
+
+  // REST SYSTEM LOGIC
+  function restShort() {
+    const roll = Math.floor(Math.random() * 4) + 1;
+    const heal = roll + 1;
+    let hpCur = parseInt(document.getElementById('hpCur').value) || 0;
+    let hpMax = parseInt(document.getElementById('hpMax').value) || 0;
+    let newHp = Math.min(hpMax, hpCur + heal);
+    
+    document.getElementById('hpCur').value = newHp;
+    autoSaveCurrentCharacter();
+    log(`☕ <strong>Short Rest</strong>: ทอย d4+1 ได้ผล ${roll}+1 = +${heal} HP (HP ปัจจุบัน: ${newHp}/${hpMax})`);
+  }
+
+  function restLong() {
+    let hpMax = parseInt(document.getElementById('hpMax').value) || 0;
+    document.getElementById('hpCur').value = hpMax;
+    
+    const roll = Math.floor(Math.random() * 6) + 1;
+    autoSaveCurrentCharacter();
+
+    const msg = `🌙 <strong>Long Rest</strong>: ฟื้นฟู HP จนเต็ม (${hpMax}/${hpMax})! ทอย d6 ได้แต้ม <span class="badge badge-crit">${roll}</span> แต้ม - โปรดนำแต้มนี้ไปเพิ่ม/รักษาค่า Attributes ด้วยตนเอง`;
+    log(msg);
+
+    alert(`🌙 Long Rest!\n\n- HP ฟื้นฟูจนเต็มแล้ว (${hpMax}/${hpMax})\n- ผลทอย d6 ได้: ${roll} แต้ม\n\n👉 กรุณานำ ${roll} แต้มนี้ไปฟื้นฟู/รักษาค่า Attributes (STR, DEX, INT) ของตัวละครด้วยตนเอง`);
+  }
+
+  function restFull() {
+    const strMax = parseInt(document.getElementById('strMax').value) || 10;
+    const dexMax = parseInt(document.getElementById('dexMax').value) || 10;
+    const intMax = parseInt(document.getElementById('intMax').value) || 10;
+    const hpMax = parseInt(document.getElementById('hpMax').value) || 5;
+
+    document.getElementById('strCur').value = strMax;
+    document.getElementById('dexCur').value = dexMax;
+    document.getElementById('intCur').value = intMax;
+    document.getElementById('hpCur').value = hpMax;
+
+    autoSaveCurrentCharacter();
+    log(`✨ <strong>Full Rest</strong>: ฟื้นฟูทุกอย่างเต็มแล้ว! (HP: ${hpMax}/${hpMax}, STR: ${strMax}/${strMax}, DEX: ${dexMax}/${dexMax}, INT: ${intMax}/${intMax})`);
+  }
+
+  // CHARACTER CREATION LOGIC
+  function rollWeaponHelper() {
+    const w = Math.floor(Math.random() * 6) + 1;
+    if (w === 1) return Math.random() < 0.5 ? 'mw_dagger' : 'mw_cudgel';
+    if (w <= 3) return Math.random() < 0.5 ? 'mw_short_sword' : 'mw_mace';
+    if (w <= 5) return 'rw_bow';
+    return Math.random() < 0.5 ? 'mw_halberd' : 'mw_war_hammer';
+  }
+
+  function rollArmorHelper() {
+    const a = Math.floor(Math.random() * 6) + 1;
+    if (a >= 2 && a <= 3) return 'ar_brigandine';
+    if (a >= 4 && a <= 5) return 'ar_chainmail';
+    if (a === 6) return 'ar_plate_mail';
+    return null;
+  }
+
+  function rollHelmShieldHelper() {
+    const hs = Math.floor(Math.random() * 6) + 1;
+    if (hs >= 2 && hs <= 3) return ['ar_leather_cap'];
+    if (hs >= 4 && hs <= 5) return ['ar_buckler'];
+    if (hs === 6) return ['ar_leather_cap', 'ar_buckler'];
+    return [];
+  }
+
+  function rollStartingEquipmentFull() {
+    const items = [];
+
+    items.push({ id: 'gd_food_ration', uses: 3 });
+    items.push({ id: 'gd_torch', uses: 1 });
+
+    const weaponId = rollWeaponHelper();
+    if (weaponId) items.push({ id: weaponId, uses: 1 });
+
+    const armorId = rollArmorHelper();
+    if (armorId) items.push({ id: armorId, uses: 1 });
+
+    const hsList = rollHelmShieldHelper();
+    hsList.forEach(id => items.push({ id, uses: 1 }));
+
+    const gearId = getRandom(CHAR_CREATION_DB.gearList);
+    items.push({ id: gearId, uses: 1 });
+
+    const toolId = getRandom(CHAR_CREATION_DB.toolsList);
+    items.push({ id: toolId, uses: 1 });
+
+    const bonusCategory = Math.floor(Math.random() * 4) + 1;
+    if (bonusCategory === 1) {
+      const extraHS = rollHelmShieldHelper();
+      extraHS.forEach(id => items.push({ id, uses: 1 }));
+    } else if (bonusCategory === 2) {
+      items.push({ id: rollWeaponHelper(), uses: 1 });
+    } else if (bonusCategory === 3) {
+      items.push({ id: getRandom(CHAR_CREATION_DB.gearList), uses: 1 });
+    } else if (bonusCategory === 4) {
+      items.push({ id: getRandom(CHAR_CREATION_DB.toolsList), uses: 1 });
+    }
+
+    return items;
+  }
+
+  function generateRandomNewCharForm() {
+    document.getElementById('newCharName').value = getRandom(names);
+    document.getElementById('newCharAncestry').value = getRandom(ancestries);
+    document.getElementById('newCharBackground').value = getRandom(CHAR_CREATION_DB.backgrounds);
+    document.getElementById('newCharTrinket').value = getRandom(CHAR_CREATION_DB.trinkets);
+
+    const physique = getRandom(CHAR_CREATION_DB.physical.physique);
+    const face = getRandom(CHAR_CREATION_DB.physical.face);
+    const hair = getRandom(CHAR_CREATION_DB.physical.hair);
+    const speech = getRandom(CHAR_CREATION_DB.physical.speech);
+    
+    const physInput = document.getElementById('newCharPhysical');
+    physInput.value = `${physique}, ${face}, ${hair}, ${speech}`;
+    autoExpandTextarea(physInput);
+
+    const virtue = getRandom(CHAR_CREATION_DB.traits.virtue);
+    const iniquity = getRandom(CHAR_CREATION_DB.traits.iniquity);
+    const reputation = getRandom(CHAR_CREATION_DB.traits.reputation);
+    const misfortune = getRandom(CHAR_CREATION_DB.traits.misfortune);
+
+    const traitInput = document.getElementById('newCharTrait');
+    traitInput.value = `${virtue}, ${iniquity}, ${reputation}, ${misfortune}`;
+    autoExpandTextarea(traitInput);
+
+    document.getElementById('newStr').value = roll3d6();
+    document.getElementById('newDex').value = roll3d6();
+    document.getElementById('newInt').value = roll3d6();
+    document.getElementById('newHp').value = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('newGold').value = roll3d6();
+  }
+
+  function confirmCreateCharacter() {
+    const starterItems = rollStartingEquipmentFull();
+
+    const newChar = {
+      id: 'char_' + Date.now(),
+      name: document.getElementById('newCharName').value || 'ไม่มีชื่อ',
+      ancestry: document.getElementById('newCharAncestry').value,
+      background: document.getElementById('newCharBackground').value,
+      trinket: document.getElementById('newCharTrinket').value,
+      physical: document.getElementById('newCharPhysical').value,
+      trait: document.getElementById('newCharTrait').value,
+      notes: '',
+      strCur: parseInt(document.getElementById('newStr').value) || 10,
+      strMax: parseInt(document.getElementById('newStr').value) || 10,
+      dexCur: parseInt(document.getElementById('newDex').value) || 10,
+      dexMax: parseInt(document.getElementById('newDex').value) || 10,
+      intCur: parseInt(document.getElementById('newInt').value) || 10,
+      intMax: parseInt(document.getElementById('newInt').value) || 10,
+      hpCur: parseInt(document.getElementById('newHp').value) || 5,
+      hpMax: parseInt(document.getElementById('newHp').value) || 5,
+      gold: parseInt(document.getElementById('newGold').value) || 10,
+      inventorySlots: starterItems,
+      assets: [],
+      assetNotes: ''
+    };
+
+    characterList.push(newChar);
+    saveAllCharactersToStorage();
+    showToast(`✨ สร้างตัวละคร <strong>${newChar.name}</strong> พร้อมสุ่มอุปกรณ์ตามตารางเรียบร้อย!`);
+    goToSelectScreen();
+  }
+
+  // UI HELPERS
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  function showToast(msg) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = msg;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 4500);
+  }
+
+  function log(msg) {
+    showToast(msg);
+    const logBox = document.getElementById('logBox');
+    if (!logBox) return;
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = `[${new Date().toLocaleTimeString('th-TH')}] ${msg}`;
+    logBox.prepend(entry);
+  }
+
+  function rollCustomDice(sides) {
+    const result = Math.floor(Math.random() * sides) + 1;
+    log(`🎲 <strong>ทอย d${sides}</strong>: ได้ผลลัพธ์ <span class="badge badge-crit">${result}</span>`);
+  }
+
+  function calculateARFromInventory() {
+    let rawAR = 0;
+    inventorySlotsData.forEach(slot => {
+      if (slot.isCustom) {
+        if (slot.hasAR && slot.ar > 0) rawAR += (parseFloat(slot.ar) || 0);
+      } else if (slot.id) {
+        const item = MARKET_DATABASE.find(i => i.id === slot.id);
+        if (item && item.ar > 0) rawAR += item.ar;
+      }
+    });
+
+    let totalAR = Math.min(3.0, rawAR);
+    document.getElementById('totalARDisplay').innerText = totalAR.toFixed(2).replace(/\.00$/, '');
+  }
+
+  // MODAL HANDLERS
+  function openCustomItemModal(index) {
+    editingCustomSlotIndex = index;
+    const slot = inventorySlotsData[index] || {};
+
+    if (slot.isCustom) {
+      document.getElementById('customName').value = slot.name || '';
+      document.getElementById('customSize').value = slot.size || 'S';
+      document.getElementById('customHasUses').checked = !!slot.hasUses;
+      document.getElementById('customUses').value = slot.uses || 1;
+      document.getElementById('customHasDamage').checked = !!slot.hasDamage;
+      document.getElementById('customDamage').value = slot.damage || 'd6';
+      document.getElementById('customHasAR').checked = !!slot.hasAR;
+      document.getElementById('customAR').value = slot.ar !== undefined ? slot.ar : 0.25;
+    } else {
+      document.getElementById('customName').value = '';
+      document.getElementById('customSize').value = 'S';
+      document.getElementById('customHasUses').checked = false;
+      document.getElementById('customUses').value = 1;
+      document.getElementById('customHasDamage').checked = false;
+      document.getElementById('customDamage').value = 'd6';
+      document.getElementById('customHasAR').checked = false;
+      document.getElementById('customAR').value = 0.25;
+    }
+
+    toggleCustomGroup('customHasUses', 'customUsesGroup');
+    toggleCustomGroup('customHasDamage', 'customDamageGroup');
+    toggleCustomGroup('customHasAR', 'customArGroup');
+
+    document.getElementById('customItemModal').classList.add('active');
+  }
+
+  function toggleCustomGroup(checkboxId, targetGroupId) {
+    const isChecked = document.getElementById(checkboxId).checked;
+    const target = document.getElementById(targetGroupId);
+    if (isChecked) target.classList.add('active');
+    else target.classList.remove('active');
+  }
+
+  function closeCustomItemModal() {
+    document.getElementById('customItemModal').classList.remove('active');
+    if (editingCustomSlotIndex !== null) {
+      const slot = inventorySlotsData[editingCustomSlotIndex];
+      if (slot && slot.id === 'custom' && !slot.isCustom) {
+        slot.id = '';
+      }
+      renderInventorySlots();
+    }
+    editingCustomSlotIndex = null;
+  }
+
+  function saveCustomItemModal() {
+    if (editingCustomSlotIndex === null) return;
+
+    const nameInput = document.getElementById('customName').value.trim();
+    const name = nameInput || 'Custom Item';
+    const size = document.getElementById('customSize').value;
+    const hasUses = document.getElementById('customHasUses').checked;
+    const uses = hasUses ? (parseInt(document.getElementById('customUses').value) || 1) : 1;
+    const hasDamage = document.getElementById('customHasDamage').checked;
+    const damage = hasDamage ? (document.getElementById('customDamage').value.trim() || 'd6') : '';
+    const hasAR = document.getElementById('customHasAR').checked;
+    const ar = hasAR ? (parseFloat(document.getElementById('customAR').value) || 0) : 0;
+
+    inventorySlotsData[editingCustomSlotIndex] = {
+      id: 'custom',
+      isCustom: true,
+      name: name,
+      size: size,
+      hasUses: hasUses,
+      uses: uses,
+      hasDamage: hasDamage,
+      damage: damage,
+      hasAR: hasAR,
+      ar: ar
+    };
+
+    document.getElementById('customItemModal').classList.remove('active');
+    log(`✨ บันทึก Custom Item: <strong>${name}</strong> ในช่องที่ ${editingCustomSlotIndex + 1}`);
+    editingCustomSlotIndex = null;
+    renderInventorySlots();
+  }
+
+  function buildInventoryDropdownOptions(slot) {
+    let html = `<option value="">-- ช่องว่าง --</option>`;
+    html += `<option value="custom" ${slot.isCustom ? 'selected' : ''}>✨ + Custom Item (ไอเทมกำหนดเอง)</option>`;
+
+    const categories = [
+      { key: 'melee', label: '⚔️ อาวุธประชิด' },
+      { key: 'ranged', label: '🏹 อาวุธระยะไกล' },
+      { key: 'armor', label: '🛡️ ชุดเกราะ & โล่' },
+      { key: 'goods', label: '🎒 สัมภาระ & อุปกรณ์' }
+    ];
+
+    categories.forEach(cat => {
+      const items = MARKET_DATABASE.filter(i => i.category === cat.key);
+      if (items.length > 0) {
+        html += `<optgroup label="${cat.label}">`;
+        items.forEach(item => {
+          const arText = item.ar > 0 ? ` [AR +${item.ar}]` : '';
+          const selected = (!slot.isCustom && item.id === slot.id) ? 'selected' : '';
+          html += `<option value="${item.id}" ${selected}>${item.name} (${item.rarity}/${item.size})${arText}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+    });
+
+    return html;
+  }
+
+  // SWAP MODE CONTROL (สำหรับ Safari / Touch Devices)
+  function toggleSwapMode() {
+    isSwapMode = !isSwapMode;
+    renderInventorySlots();
+  }
+
+  function moveSlot(index, direction) {
+    const targetIndex = index + direction;
+    if (targetIndex < 0 || targetIndex >= inventorySlotsData.length) return;
+
+    const temp = inventorySlotsData[index];
+    inventorySlotsData[index] = inventorySlotsData[targetIndex];
+    inventorySlotsData[targetIndex] = temp;
+
+    renderInventorySlots();
+  }
+
+  function renderInventorySlots() {
+    // ปรับเปลี่ยนสถานะปุ่ม Swap / Done
+    const btn = document.getElementById('swapBtn');
+    if (btn) {
+      if (isSwapMode) {
+        btn.innerText = '✅ Done';
+        btn.className = 'btn-green';
+      } else {
+        btn.innerText = '🔄 Swap';
+        btn.className = 'btn-outline';
+      }
+    }
+
+    const strMax = parseInt(document.getElementById('strMax').value) || 10;
+    const baseMaxSlots = Math.floor(strMax / 2) + 10;
+    
+    let bulkyCount = 0;
+    inventorySlotsData.forEach(slot => {
+      if (slot.isCustom) {
+        if (slot.size === 'B') bulkyCount++;
+      } else if (slot.id) {
+        const item = MARKET_DATABASE.find(i => i.id === slot.id);
+        if (item && item.size === 'B') bulkyCount++;
+      }
+    });
+
+    const maxSlots = Math.max(1, baseMaxSlots - bulkyCount);
+    const grid = document.getElementById('inventoryGrid');
+
+    while (inventorySlotsData.length < maxSlots) inventorySlotsData.push({ id: '', uses: 1 });
+    if (inventorySlotsData.length > maxSlots) inventorySlotsData = inventorySlotsData.slice(0, maxSlots);
+
+    grid.innerHTML = '';
+
+    inventorySlotsData.forEach((slot, index) => {
+      const slotDiv = document.createElement('div');
+      const isFilled = (slot.id !== '' || slot.isCustom);
+      slotDiv.className = `inv-slot-card ${isFilled ? 'filled' : ''}`;
+      slotDiv.id = `slot-card-${index}`;
+      slotDiv.draggable = !isSwapMode; // ปิด draggable ขณะอยู่ในโหมดสลับปุ่ม
+
+      slotDiv.ondragstart = (e) => handleDragStart(e, index);
+      slotDiv.ondragover = (e) => handleDragOver(e, index);
+      slotDiv.ondrop = (e) => handleDrop(e, index);
+
+      let optionsHtml = buildInventoryDropdownOptions(slot);
+
+      let usesHtml = '';
+      if (isFilled) {
+        const showUses = slot.isCustom ? slot.hasUses : true;
+        if (showUses) {
+          usesHtml = `
+            <div class="uses-control" title="จำนวน / วันใช้งาน">
+              <button class="btn-use" onclick="changeSlotUses(${index}, -1)">-</button>
+              <span style="font-size:0.8rem; font-weight:bold; min-width:18px; text-align:center;">${slot.uses || 1}</span>
+              <button class="btn-use" onclick="changeSlotUses(${index}, 1)">+</button>
+            </div>
+          `;
+        }
+      }
+
+      let customEditBtn = '';
+      let customInfoText = '';
+      if (slot.isCustom) {
+        customEditBtn = `<button class="btn-outline" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center;" title="แก้ไข Custom Item" onclick="openCustomItemModal(${index})">✏️</button>`;
+        let details = [];
+        if (slot.size) details.push(`ขนาด: ${slot.size}`);
+        if (slot.hasDamage && slot.damage) details.push(`Dmg: ${slot.damage}`);
+        if (slot.hasAR && slot.ar) details.push(`AR: +${slot.ar}`);
+        customInfoText = `<div style="font-size:0.75rem; color:var(--accent-gold); margin-top:2px; word-break:break-word;">✨ ${slot.name} ${details.length ? '(' + details.join(', ') + ')' : ''}</div>`;
+      }
+
+      // แสดงผลเลขลำดับ หรือ ปุ่มลูกศรขึ้น/ลง เมื่ออยู่ในโหมด Swap
+      let numberOrArrowsHtml = '';
+      if (isSwapMode) {
+        const disUp = (index === 0) ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
+        const disDown = (index === inventorySlotsData.length - 1) ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
+        numberOrArrowsHtml = `
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <button class="btn-use" onclick="moveSlot(${index}, -1)" ${disUp} title="เลื่อนขึ้น">▲</button>
+            <button class="btn-use" onclick="moveSlot(${index}, 1)" ${disDown} title="เลื่อนลง">▼</button>
+          </div>
+        `;
+      } else {
+        numberOrArrowsHtml = `<span class="slot-num">${index + 1}</span>`;
+      }
+
+      slotDiv.innerHTML = `
+        <span class="drag-handle" title="คลิกลากสลับตำแหน่ง">⋮⋮</span>
+        ${numberOrArrowsHtml}
+        <div style="flex:1; display:flex; flex-direction:column; min-width: 0;">
+          <select class="slot-select" onchange="onSlotSelectChange(${index}, this.value)">
+            ${optionsHtml}
+          </select>
+          ${customInfoText}
+        </div>
+        ${usesHtml}
+        ${customEditBtn}
+        <button class="btn-delete" title="ลบไอเทม" onclick="clearSlot(${index})">🗑️</button>
+      `;
+
+      grid.appendChild(slotDiv);
+    });
+
+    document.getElementById('maxSlots').innerText = maxSlots;
+    document.getElementById('maxSlotsCount').innerText = maxSlots;
+
+    updateInventoryCount();
+    calculateARFromInventory();
+    autoSaveCurrentCharacter();
+  }
+
+  function changeSlotUses(index, delta) {
+    if (!inventorySlotsData[index]) return;
+    const currentUses = inventorySlotsData[index].uses || 1;
+    inventorySlotsData[index].uses = Math.max(0, currentUses + delta);
+    renderInventorySlots();
+  }
+
+  function handleDragStart(e, index) {
+    draggedSlotIndex = index;
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
+
+  function handleDrop(e, targetIndex) {
+    e.preventDefault();
+    if (draggedSlotIndex !== null && draggedSlotIndex !== targetIndex) {
+      const temp = inventorySlotsData[draggedSlotIndex];
+      inventorySlotsData[draggedSlotIndex] = inventorySlotsData[targetIndex];
+      inventorySlotsData[targetIndex] = temp;
+
+      const slot1 = inventorySlotsData[targetIndex];
+      const name1 = slot1.isCustom ? slot1.name : (MARKET_DATABASE.find(i => i.id === slot1.id)?.name || 'ช่องว่าง');
+      log(`🔄 สลับตำแหน่งไอเทม: <strong>${name1}</strong> ไปยังช่อง ${targetIndex + 1}`);
+      renderInventorySlots();
+    }
+  }
+
+  function onSlotSelectChange(index, value) {
+    if (value === 'custom') {
+      inventorySlotsData[index] = { id: 'custom', isCustom: false };
+      openCustomItemModal(index);
+    } else {
+      const item = MARKET_DATABASE.find(i => i.id === value);
+      inventorySlotsData[index] = {
+        id: value,
+        isCustom: false,
+        uses: (item && item.uses) ? item.uses : 1
+      };
+      renderInventorySlots();
+    }
+  }
+
+  function clearSlot(index) {
+    const slot = inventorySlotsData[index];
+    if (slot.id || slot.isCustom) {
+      const name = slot.isCustom ? slot.name : (MARKET_DATABASE.find(i => i.id === slot.id)?.name || 'ไอเทม');
+      inventorySlotsData[index] = { id: '', uses: 1 };
+      renderInventorySlots();
+      log(`🗑️ ลบ <strong>${name}</strong> ออกจากช่อง ${index + 1}`);
+    }
+  }
+
+  function updateInventoryCount() {
+    let filledCount = 0;
+    inventorySlotsData.forEach(slot => {
+      if (slot.id !== '' || slot.isCustom) filledCount++;
+    });
+
+    const maxSlots = parseInt(document.getElementById('maxSlots').innerText) || 10;
+    document.getElementById('usedSlotsCount').innerText = filledCount;
+
+    const statusEl = document.getElementById('encumbranceStatus');
+    if (filledCount > maxSlots) {
+      statusEl.innerHTML = `<span class="badge badge-fail">แบกเกินกำหนด! (${filledCount}/${maxSlots})</span>`;
+    } else {
+      statusEl.innerHTML = `<span class="badge badge-success">รับน้ำหนักได้ปกติ (${filledCount}/${maxSlots})</span>`;
+    }
+  }
+
+  function renderAssets() {
+    const container = document.getElementById('assetsList');
+    container.innerHTML = '';
+
+    if (!assetsData || assetsData.length === 0) {
+      container.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.8rem; padding:8px;">ยังไม่มีทรัพย์สิน การจ้างวาน หรือสัตว์พาหนะ</div>`;
+      return;
+    }
+
+    assetsData.forEach((asset, index) => {
+      const div = document.createElement('div');
+      div.className = 'asset-item';
+      div.innerHTML = `
+        <div>
+          <strong style="color:var(--accent-gold); font-size:0.88rem;">${asset.name}</strong>
+          <span style="font-size:0.8rem; color:var(--text-muted);">(${asset.desc})</span>
+        </div>
+        <button class="btn-delete" style="width:28px; height:28px;" title="ยกเลิก/ลบออก" onclick="removeAsset(${index})">🗑️</button>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function removeAsset(index) {
+    if (confirm('คุณต้องการลบทรัพย์สิน/บริการนี้ใช่หรือไม่?')) {
+      const removed = assetsData.splice(index, 1)[0];
+      renderAssets();
+      autoSaveCurrentCharacter();
+      log(`🗑️ ยกเลิก/ลบ <strong>${removed ? removed.name : 'ทรัพย์สิน'}</strong> ออกเรียบร้อยแล้ว`);
+    }
+  }
+
+  function renderMarketplace(category = 'all') {
+    const list = document.getElementById('marketList');
+    list.innerHTML = '';
+
+    const filtered = category === 'all' 
+      ? MARKET_DATABASE 
+      : MARKET_DATABASE.filter(item => item.category === category);
+
+    filtered.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'market-item';
+      
+      const arText = item.ar > 0 ? ` | +${item.ar} AR` : '';
+      const dmgText = item.damage ? ` | ดาเมจ: ${item.damage}` : '';
+
+      let rarityClass = 'rarity-c';
+      if (item.rarity === 'U') rarityClass = 'rarity-u';
+      if (item.rarity === 'R') rarityClass = 'rarity-r';
+
+      let sizeClass = 'size-s';
+      if (item.size === 'T') sizeClass = 'size-t';
+      if (item.size === 'B') sizeClass = 'size-b';
+
+      div.innerHTML = `
+        <div class="market-item-info">
+          <strong>${item.name}</strong>
+          <div>
+            <span class="badge ${rarityClass}">${item.rarity}</span>
+            <span class="badge ${sizeClass}">${item.size}</span>
+            ${item.desc}${dmgText}${arText} | <strong>ราคา: ${item.cost}c</strong>
+          </div>
+        </div>
+        <button class="market-buy-btn btn-green" onclick="buyMarketItem('${item.id}')">🛒 ซื้อ</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  function filterMarket(category, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderMarketplace(category);
+  }
+
+  function buyMarketItem(itemId) {
+    const item = MARKET_DATABASE.find(i => i.id === itemId);
+    if (!item) return;
+
+    let charGold = parseInt(document.getElementById('charGold').value) || 0;
+    if (charGold < item.cost) {
+      alert(`ทองไม่พอ! ต้องใช้ ${item.cost}c แต่คุณมี ${charGold}c`);
+      return;
+    }
+
+    if (['hireling', 'service', 'mount', 'structure'].includes(item.category)) {
+      assetsData.push({
+        id: item.id,
+        name: item.name,
+        desc: item.desc || item.category
+      });
+      charGold -= item.cost;
+      document.getElementById('charGold').value = charGold;
+      renderAssets();
+      autoSaveCurrentCharacter();
+      log(`🛒 ซื้อ/รับบริการ: <strong>${item.name}</strong> (${item.cost}c) - เพิ่มใน Assets แล้ว`);
+      return;
+    }
+
+    const emptyIndex = inventorySlotsData.findIndex(s => s.id === '' && !s.isCustom);
+    if (emptyIndex === -1) {
+      alert('ช่องเก็บของเต็มแล้ว!');
+      return;
+    }
+
+    inventorySlotsData[emptyIndex] = {
+      id: item.id,
+      isCustom: false,
+      uses: item.uses || 1
+    };
+
+    charGold -= item.cost;
+    document.getElementById('charGold').value = charGold;
+    renderInventorySlots();
+    autoSaveCurrentCharacter();
+    log(`🛒 ซื้อไอเทม: <strong>${item.name}</strong> (${item.cost}c) ใส่ในช่อง ${emptyIndex + 1}`);
+  }
+
+  // INITIALIZATION ON LOAD
+  window.onload = function() {
+    loadAllCharactersFromStorage();
+    renderCharacterListCard();
+    renderMarketplace('all');
+  };
+</script>
+</body>
+</html>
