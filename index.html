@@ -636,7 +636,7 @@
 <!-- Custom Item Popup Modal -->
 <div id="customItemModal" class="modal-overlay">
   <div class="modal-card">
-    <div class="modal-header">✨ กำหนดรายละเอียด Custom / Magic Item</div>
+    <div class="modal-header">✨ กำหนดรายละเอียดไอเทม</div>
     
     <div class="form-group">
       <label for="customName">ชื่อไอเทม (Item Name)</label>
@@ -1211,7 +1211,7 @@
   let assetsData = [];
   let draggedSlotIndex = null;
   let editingCustomSlotIndex = null;
-  let isSwapMode = false; // โหมดสลับลำดับด้วยลูกศรสำหรับ Safari/Mobile
+  let isSwapMode = false;
 
   // SYSTEM HELPERS
   function roll3d6() {
@@ -1564,6 +1564,33 @@
     log(`🎲 <strong>ทอย d${sides}</strong>: ได้ผลลัพธ์ <span class="badge badge-crit">${result}</span>`);
   }
 
+  function performCheck(statId, statName) {
+    const val = parseInt(document.getElementById(statId).value) || 10;
+    const rollMode = document.querySelector('input[name="rollMode"]:checked')?.value || 'normal';
+    
+    let d1 = Math.floor(Math.random() * 20) + 1;
+    let d2 = Math.floor(Math.random() * 20) + 1;
+    let finalRoll = d1;
+    let rollDetail = `d20=${d1}`;
+
+    if (rollMode === 'adv') {
+      finalRoll = Math.min(d1, d2);
+      rollDetail = `[${d1}, ${d2}] -> เลือก ${finalRoll}`;
+    } else if (rollMode === 'disadv') {
+      finalRoll = Math.max(d1, d2);
+      rollDetail = `[${d1}, ${d2}] -> เลือก ${finalRoll}`;
+    }
+
+    const success = finalRoll <= val;
+    const badge = success ? '<span class="badge badge-success">สำเร็จ</span>' : '<span class="badge badge-fail">ล้มเหลว</span>';
+    
+    log(`🎲 <strong>ทดสอบ ${statName}</strong> (เป้าหมาย ≤ ${val}): ทอยได้ ${finalRoll} (${rollDetail}) ${badge}`);
+  }
+
+  function updateCalculatedStats() {
+    renderInventorySlots();
+  }
+
   function calculateARFromInventory() {
     let rawAR = 0;
     inventorySlotsData.forEach(slot => {
@@ -1634,7 +1661,7 @@
     if (editingCustomSlotIndex === null) return;
 
     const nameInput = document.getElementById('customName').value.trim();
-    const name = nameInput || 'Custom Item';
+    const name = nameInput || 'ไอเทมใหม่';
     const size = document.getElementById('customSize').value;
     const hasUses = document.getElementById('customHasUses').checked;
     const uses = hasUses ? (parseInt(document.getElementById('customUses').value) || 1) : 1;
@@ -1657,14 +1684,23 @@
     };
 
     document.getElementById('customItemModal').classList.remove('active');
-    log(`✨ บันทึก Custom Item: <strong>${name}</strong> ในช่องที่ ${editingCustomSlotIndex + 1}`);
+    log(`✨ บันทึกไอเทม: <strong>${name}</strong> ในช่องที่ ${editingCustomSlotIndex + 1}`);
     editingCustomSlotIndex = null;
     renderInventorySlots();
   }
 
   function buildInventoryDropdownOptions(slot) {
     let html = `<option value="">-- ช่องว่าง --</option>`;
-    html += `<option value="custom" ${slot.isCustom ? 'selected' : ''}>✨ + Custom Item (ไอเทมกำหนดเอง)</option>`;
+
+    if (slot.isCustom) {
+      let displayName = slot.name || 'ไอเทมกำหนดเอง';
+      if (slot.hasDamage && slot.damage) {
+        displayName += ` (${slot.damage})`;
+      }
+      html += `<option value="custom" selected>✨ ${displayName}</option>`;
+    } else {
+      html += `<option value="custom">✨ + สร้างไอเทมใหม่...</option>`;
+    }
 
     const categories = [
       { key: 'melee', label: '⚔️ อาวุธประชิด' },
@@ -1689,7 +1725,7 @@
     return html;
   }
 
-  // SWAP MODE CONTROL (สำหรับ Safari / Touch Devices)
+  // SWAP MODE CONTROL
   function toggleSwapMode() {
     isSwapMode = !isSwapMode;
     renderInventorySlots();
@@ -1707,7 +1743,6 @@
   }
 
   function renderInventorySlots() {
-    // ปรับเปลี่ยนสถานะปุ่ม Swap / Done
     const btn = document.getElementById('swapBtn');
     if (btn) {
       if (isSwapMode) {
@@ -1745,7 +1780,7 @@
       const isFilled = (slot.id !== '' || slot.isCustom);
       slotDiv.className = `inv-slot-card ${isFilled ? 'filled' : ''}`;
       slotDiv.id = `slot-card-${index}`;
-      slotDiv.draggable = !isSwapMode; // ปิด draggable ขณะอยู่ในโหมดสลับปุ่ม
+      slotDiv.draggable = !isSwapMode;
 
       slotDiv.ondragstart = (e) => handleDragStart(e, index);
       slotDiv.ondragover = (e) => handleDragOver(e, index);
@@ -1770,15 +1805,15 @@
       let customEditBtn = '';
       let customInfoText = '';
       if (slot.isCustom) {
-        customEditBtn = `<button class="btn-outline" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center;" title="แก้ไข Custom Item" onclick="openCustomItemModal(${index})">✏️</button>`;
+        customEditBtn = `<button class="btn-outline" style="width:34px; height:34px; padding:0; display:flex; align-items:center; justify-content:center;" title="แก้ไขไอเทม" onclick="openCustomItemModal(${index})">✏️</button>`;
         let details = [];
         if (slot.size) details.push(`ขนาด: ${slot.size}`);
-        if (slot.hasDamage && slot.damage) details.push(`Dmg: ${slot.damage}`);
         if (slot.hasAR && slot.ar) details.push(`AR: +${slot.ar}`);
-        customInfoText = `<div style="font-size:0.75rem; color:var(--accent-gold); margin-top:2px; word-break:break-word;">✨ ${slot.name} ${details.length ? '(' + details.join(', ') + ')' : ''}</div>`;
+        if (details.length > 0) {
+          customInfoText = `<div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px; word-break:break-word;">${details.join(' | ')}</div>`;
+        }
       }
 
-      // แสดงผลเลขลำดับ หรือ ปุ่มลูกศรขึ้น/ลง เมื่ออยู่ในโหมด Swap
       let numberOrArrowsHtml = '';
       if (isSwapMode) {
         const disUp = (index === 0) ? 'disabled style="opacity:0.25; cursor:not-allowed;"' : '';
@@ -1922,8 +1957,21 @@
     }
   }
 
+  // MARKETPLACE FUNCTIONS
+  let currentMarketFilter = 'all';
+
+  function filterMarket(category, btnElement) {
+    currentMarketFilter = category;
+    if (btnElement) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btnElement.classList.add('active');
+    }
+    renderMarketplace(category);
+  }
+
   function renderMarketplace(category = 'all') {
     const list = document.getElementById('marketList');
+    if (!list) return;
     list.innerHTML = '';
 
     const filtered = category === 'all' 
@@ -1933,66 +1981,47 @@
     filtered.forEach(item => {
       const div = document.createElement('div');
       div.className = 'market-item';
-      
-      const arText = item.ar > 0 ? ` | +${item.ar} AR` : '';
-      const dmgText = item.damage ? ` | ดาเมจ: ${item.damage}` : '';
 
-      let rarityClass = 'rarity-c';
-      if (item.rarity === 'U') rarityClass = 'rarity-u';
-      if (item.rarity === 'R') rarityClass = 'rarity-r';
-
-      let sizeClass = 'size-s';
-      if (item.size === 'T') sizeClass = 'size-t';
-      if (item.size === 'B') sizeClass = 'size-b';
+      let rarityBadge = `<span class="badge rarity-${item.rarity.toLowerCase()}">${item.rarity}</span>`;
+      let sizeBadge = `<span class="badge size-${item.size.toLowerCase()}">${item.size}</span>`;
+      let extraInfo = item.damage ? ` | Dmg: ${item.damage}` : (item.ar ? ` | AR: +${item.ar}` : '');
 
       div.innerHTML = `
         <div class="market-item-info">
-          <strong>${item.name}</strong>
-          <div>
-            <span class="badge ${rarityClass}">${item.rarity}</span>
-            <span class="badge ${sizeClass}">${item.size}</span>
-            ${item.desc}${dmgText}${arText} | <strong>ราคา: ${item.cost}c</strong>
-          </div>
+          <strong>${rarityBadge} ${sizeBadge} ${item.name}</strong>
+          <div>${item.desc}${extraInfo} - <span style="color:var(--accent-gold); font-weight:bold;">${item.cost}c</span></div>
         </div>
-        <button class="market-buy-btn btn-green" onclick="buyMarketItem('${item.id}')">🛒 ซื้อ</button>
+        <button class="btn-green market-buy-btn" onclick="buyMarketItem('${item.id}')">🛒 ซื้อ (${item.cost}c)</button>
       `;
       list.appendChild(div);
     });
-  }
-
-  function filterMarket(category, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderMarketplace(category);
   }
 
   function buyMarketItem(itemId) {
     const item = MARKET_DATABASE.find(i => i.id === itemId);
     if (!item) return;
 
-    let charGold = parseInt(document.getElementById('charGold').value) || 0;
-    if (charGold < item.cost) {
-      alert(`ทองไม่พอ! ต้องใช้ ${item.cost}c แต่คุณมี ${charGold}c`);
+    let currentGold = parseInt(document.getElementById('charGold').value) || 0;
+    if (currentGold < item.cost) {
+      showToast('❌ เหรียญทองไม่พอ!');
       return;
     }
 
     if (['hireling', 'service', 'mount', 'structure'].includes(item.category)) {
       assetsData.push({
-        id: item.id,
         name: item.name,
-        desc: item.desc || item.category
+        desc: `${item.desc} (${item.cost}c)`
       });
-      charGold -= item.cost;
-      document.getElementById('charGold').value = charGold;
+      document.getElementById('charGold').value = currentGold - item.cost;
       renderAssets();
       autoSaveCurrentCharacter();
-      log(`🛒 ซื้อ/รับบริการ: <strong>${item.name}</strong> (${item.cost}c) - เพิ่มใน Assets แล้ว`);
+      log(`🛒 ซื้อ/รับบริการ: <strong>${item.name}</strong> (-${item.cost}c)`);
       return;
     }
 
-    const emptyIndex = inventorySlotsData.findIndex(s => s.id === '' && !s.isCustom);
+    let emptyIndex = inventorySlotsData.findIndex(s => !s.id && !s.isCustom);
     if (emptyIndex === -1) {
-      alert('ช่องเก็บของเต็มแล้ว!');
+      showToast('❌ ช่องเก็บของเต็ม!');
       return;
     }
 
@@ -2002,14 +2031,12 @@
       uses: item.uses || 1
     };
 
-    charGold -= item.cost;
-    document.getElementById('charGold').value = charGold;
+    document.getElementById('charGold').value = currentGold - item.cost;
     renderInventorySlots();
     autoSaveCurrentCharacter();
-    log(`🛒 ซื้อไอเทม: <strong>${item.name}</strong> (${item.cost}c) ใส่ในช่อง ${emptyIndex + 1}`);
+    log(`🛒 ซื้อไอเทม: <strong>${item.name}</strong> ใส่ในช่องที่ ${emptyIndex + 1} (-${item.cost}c)`);
   }
 
-  // INITIALIZATION ON LOAD
   window.onload = function() {
     loadAllCharactersFromStorage();
     renderCharacterListCard();
